@@ -1,0 +1,4 @@
+;/*FB_PKG_DELIM*/
+
+__d("CometStarsShowerData",["$InternalEnum","DateConsts"],(function(a,b,c,d,e,f,g){"use strict";a=5*d("DateConsts").MS_PER_SEC;c=b("$InternalEnum").Mirrored(["Active","Success","Failure"]);g.STARS_SHOWER_PERSIST_TIME_MS=a;g.StarsShowerStatus=c}),98);
+__d("FanFundingStarsEventsTypedLoggerLite",["generateLiteTypedLogger"],(function(a,b,c,d,e,f){"use strict";e.exports=b("generateLiteTypedLogger")("logger:FanFundingStarsEventsLoggerConfig")}),null);

@@ -1,0 +1,61 @@
+<!-- Dropdown for selecting the grade level -->
+<div class='col-sm-6  text-dark mt-2'>
+  <label for ='GRADE_LEVEL_ID'>Grade Level</label>
+  <select name='GRADE_LEVEL_ID' id='GRADE_LEVEL_ID' class='form-control border border-dark' required>
+    <option value=''>Select</option>
+    <?php
+    require_once '../db_con.php';
+    $query = "SELECT * FROM grade_level";
+    $result = mysqli_query($conn, $query);
+    while ($row = mysqli_fetch_object($result)) {
+      echo '<option value=' . $row->GRADE_LEVEL_ID . '>' . $row->GRADE_LEVEL . '</option>';
+    }
+    mysqli_free_result($result);
+    ?>
+  </select>
+</div>
+
+<!-- Dropdown for selecting the semester -->
+<div class='col-sm-6  text-dark mt-2'>
+  <label for='sched_semester'>Terms</label>
+  <select name='sched_semester' id='sched_semester' class='form-control border border-dark' required>
+    <option value=''>Select</option>
+    <option value='Quarter'>Quarter</option>
+    <option value='First'>First</option>
+    <option value='Second'>Second</option>
+  </select>
+</div>
+
+<!-- Container for the dynamically populated dropdown -->
+<div id='subject-dropdown-container' class='col-sm-6 text-dark mt-2'>
+  <label for='subject'>Subject</label>
+  <select name='subject' id='subject' class='form-control border border-dark' required>
+    <option value=''>Select</option>
+  </select>
+</div>
+
+<!-- JavaScript code to handle the AJAX request and populate the dropdown -->
+<script>
+  $(document).ready(function() {
+    // Listen for changes in the grade level and semester dropdowns
+    $('#GRADE_LEVEL_ID, #sched_semester').change(function() {
+      // Get the selected values
+      var gradeLevelId = $('#GRADE_LEVEL_ID').val();
+      var semester = $('#sched_semester').val();
+
+      // Make the AJAX request to loaddata.php
+      $.ajax({
+        type: 'POST',
+        url: 'loaddata.php',
+        data: {id: gradeLevelId, SEMESTER: semester},
+        success: function(response) {
+          // Replace the contents of the subject dropdown with the response
+          $('#subject').html(response);
+        },
+        error: function(xhr, status, error) {
+          console.error(error);
+        }
+      });
+    });
+  });
+</script>

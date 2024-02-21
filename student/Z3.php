@@ -1,0 +1,2220 @@
+<?php
+
+
+
+session_start();
+
+
+
+
+
+if (!isset($_SESSION['student_id'])) {
+    header("location: ../index.php");
+}
+
+
+include '../db_con.php';
+include_once "randomString.php";
+include('includes/header.php');
+
+
+$emai = $_SESSION['emai'];
+$pass = $_SESSION['pass'];
+
+
+
+$sql = "Select * from student where student_id = '$_SESSION[student_id]'";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+
+
+
+$findIfEnroll = "SELECT * from student WHERE status = 'pending'";
+$findIfEnrollresult = mysqli_query($conn, $findIfEnroll);
+
+$findIfEnrollresultrow = mysqli_fetch_assoc($findIfEnrollresult);
+
+
+if ($row == null) {
+
+    $row['date_of_registration'] = '';
+    $row['school_last_attended'] = '';
+    $row['school_year'] = '';
+    $row['first_name'] = '';
+    $row['last_name'] = '';
+    $row['first_name'] = '';
+    $row['middle_name'] = '';
+    $row['suffix_name'] = '';
+    $row['contact_number'] = '';
+    $row['age'] = '';
+    // $row['email'] = '';
+    $row['unit_number'] = '';
+    $row['street'] = '';
+    $row['barangay'] = '';
+    $row['city'] = '';
+    $row['district'] = '';
+    $row['zip_code'] = '';
+    $row['gender'] = '';
+    $row['birthdate'] = '';
+    $row['birthplace'] = '';
+    $row['height'] = '';
+    $row['weight'] = '';
+    $row['religion'] = '';
+    $row['civil_status'] = '';
+    $row['parent_name'] = '';
+    $row['parent_occupation'] = '';
+    $row['parent_contact_no'] = '';
+    $row['guardian_name'] = '';
+    $row['guardian_occupation'] = '';
+    $row['guardian_contact_no'] = '';
+    $row['student_type'] = '';
+    $row['GRADE_LEVEL_ID'] = '';
+    $row['LRN'] = '';
+    $row['strand'] = '';
+    $row['image'] = '';
+} else {
+
+    $sql = "Select * from student where student_id = '$_SESSION[student_id]'";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+}
+
+
+$sql1 = "Select * from account where student_id = '$_SESSION[student_id]'";
+$result1 = $conn->query($sql1);
+
+$row1 = $result1->fetch_assoc();
+
+
+
+
+if (isset($_POST['add_user'])) {
+
+    $_SESSION['date_of_registration'] = $_POST['date_of_registration'];
+    $_SESSION['unique_id'] = $ran_id = rand(time(), 100000000);
+    $_SESSION['school_last_attended']  = $_POST['school_last_attended'];
+    $_SESSION['school_year']  = $_POST['school_year'];
+    $_SESSION['first_name'] = $_POST['first_name'];
+    $_SESSION['last_name'] = $_POST['last_name'];
+    $_SESSION['middle_name'] = $_POST['middle_name'];
+    $_SESSION['suffix_name'] = $_POST['suffix_name'];
+    $_SESSION['contact_number'] = $_POST['contact_number'];
+    $_SESSION['age'] = $_POST['age'];
+    // $_SESSION['email'] =  $_POST['email'];
+    $_SESSION['unit_number'] = $_POST['unit_number'];
+    $_SESSION['street'] = $_POST['street'];
+
+    $_SESSION['barangay'] = $_POST['barangay'];
+    $_SESSION['city'] = $_POST['city'];
+    $_SESSION['district'] = $_POST['district'];
+
+
+    $_SESSION['zip_code'] = $_POST['zip_code'];
+    // $_SESSION['gender'] = $_POST['gender'];
+    $_SESSION['birthdate'] = $_POST['birthdate'];
+
+    $_SESSION['birthplace'] = $_POST['birthplace'];
+    $_SESSION['height'] = $_POST['height'];
+    $_SESSION['weight'] = $_POST['weight'];
+    $_SESSION['religion'] = $_POST['religion'];
+
+    // education Doctoral
+    $_SESSION['civil_status'] = $_POST['civil_status'];
+    $_SESSION['parent_name'] = $_SESSION['parent_name'];
+    $_SESSION['parent_occupation'] = $_POST['parent_occupation'];
+
+    $_SESSION['parent_contact_no'] = $_POST['parent_contact_no'];
+    $_SESSION['guardian_name'] = $_POST['guardian_name'];
+    $_SESSION['guardian_occupation'] = $_POST['guardian_occupation'];
+    $_SESSION['guardian_contact_no'] = $_POST['guardian_contact_no'];
+    $_SESSION['GRADE_LEVEL'] = $_POST['GRADE_LEVEL'];
+    $_SESSION['LRN'] = $_POST['LRN'];
+    $_SESSION['strand'] = $_POST['strand'];
+
+    $_SESSION['student_type'] = $_POST['student_type'];
+
+
+
+    $searchCont = "SELECT * FROM student WHERE contact_number LIKE '%$_SESSION[contact_number]%'";
+    $searchContQuery  = $conn->query($searchCont);
+
+    if ($searchContQuery->num_rows > 0) {
+        $filename = $_FILES["image"]["name"];
+        $tempname = $_FILES["image"]["tmp_name"];
+        $folder = "../img/user-images/" . randomString(8) . "/" . $filename;
+
+        mkdir(dirname($folder));
+
+        if (move_uploaded_file($tempname, $folder)) {
+            $_SESSION["p_p"] = $folder;
+        }
+        header("Location: togo.php");
+    } else {
+
+        $filename = $_FILES["image"]["name"];
+        $tempname = $_FILES["image"]["tmp_name"];
+        $folder = "../img/user-images/" . randomString(8) . "/" . $filename;
+
+        mkdir(dirname($folder));
+
+        if (move_uploaded_file($tempname, $folder)) {
+            $_SESSION["p_p"] = $folder;
+        }
+        $query = "INSERT INTO student(";
+        $query .= "date_of_registration,unique_id,school_last_attended,school_year,first_name, last_name, middle_name, suffix_name, contact_number, age, unit_number, street, barangay, city, district, zip_code, gender, birthdate, birthplace, height, weight, religion, civil_status, parent_name, parent_occupation, parent_contact_no, guardian_name, guardian_occupation, guardian_contact_no,GRADE_LEVEL_ID,LRN,strand,status,student_type,NewEnrollees,p_p";
+        $query .= ") Values (";
+        $query .= " '{$_SESSION['date_of_registration']}','{$_SESSION['unique_id']}', '{$_SESSION['school_last_attended']}','{$_SESSION['school_year']}','{$_SESSION['first_name']}','{$_SESSION['last_name']}','{$_SESSION['middle_name']}','{$_SESSION['suffix_name']}','{$_SESSION['contact_number']}','{$_SESSION['age']}','{$_SESSION['unit_number']}','{$_SESSION['street']}','{$_SESSION['barangay']}','{$_SESSION['city']}','{$_SESSION['district']}','{$_SESSION['zip_code']}','{$_SESSION['gender']}','{$_SESSION['birthdate']}','{$_SESSION['birthplace']}','{$_SESSION['height']}','{$_SESSION['weight']}','{$_SESSION['religion']}','{$_SESSION['civil_status']}','{$_SESSION['parent_name']}','{$_SESSION['parent_occupation']}','{$_SESSION['parent_contact_no']}','{$_POST['guardian_name']}','{$_SESSION['guardian_occupation']}','{$_SESSION['guardian_contact_no']}','{$_SESSION['GRADE_LEVEL']}','{$_SESSION['LRN']}','{$_SESSION['strand']}','Pending ','{$_SESSION['student_type']}','1','{$_SESSION['p_p']}'";
+
+        $query .= ")";
+
+
+        // FUNCTION PARA MAKUHA ANG ID SAN STUDENT PARA SAN PAG CREATE NYA ACCOUNT TAS PAG FILL UP NYA SAN FORM MAKIKITA SA ACCOUNT ANG STUDENT_ID
+        $result = mysqli_query($conn, $query);
+        if ($result) {
+            $query = "SELECT student_id from student WHERE first_name = '$_POST[first_name]' and last_name = '$_POST[last_name]'";
+            $result = mysqli_query($conn, $query);
+            $row = mysqli_fetch_assoc($result);
+            $sql = "UPDATE account SET student_id=$row[student_id] ";
+            $sql .= " WHERE email='{$emai}' and password='{$pass}'";
+            $result = mysqli_query($conn, $sql);
+            $_SESSION['user_id'] = $row['student_id'];
+
+
+            header("Location: goto.php");
+
+            // header ("location: Enroll.php");
+        } else {
+            echo mysqli_error();
+        }
+    }
+}
+
+
+
+
+
+
+$date_of_registration =  $school_last_attended =   $school_year =  $first_name = $last_name = $middle_name = $suffix_name = $contact_number = $age  = $unit_number = $street = $barangay = $city = $district = $zip_code = $gender = $birthdate = $birthplace = $height = $weight = $religion = $civil_status = $parent_name = $parent_occupation = $parent_contact_no = $guardian_name = $guardian_occupation = $guardian_contact_no = $GRADE_LEVEL_ID = $LRN =   $strand = $student_type =  $name =  "";
+
+
+
+
+$action = "add_user";
+$btn_value = "Save info";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//print($_SESSION['user_id']);
+
+
+
+
+$currentyear = date('Y');
+$nextyear =  date('Y') + 1;
+$sy = $currentyear . '-' . $nextyear;
+$_SESSION['School_year'] = $sy;
+
+
+
+$setSem = "Select * from tblsemester where SETSEM= '1'";
+$searchSemResult = $conn->query($setSem);
+$searchSetResultRow = $searchSemResult->fetch_assoc();
+
+
+$stud = "Select * from student where status = 'Pending' || status = 'Approved' and  student_id = '$_SESSION[student_id]'";
+$searchstudResult = $conn->query($stud);
+$searchstudResultRow = $searchstudResult->fetch_assoc();
+
+
+// $stude = "Select * from student where student_type = 'student_type' and  student_id = '$_SESSION[student_id]'";
+// $searchstypeResult = $conn->query($stude);
+// $searchstudResultRow = $searchstypeResult->fetch_assoc();
+
+$setyr = "Select * from school_year where school_year_status = '1'";
+$searchYrResult = $conn->query($setyr);
+$searchYrRow = $searchYrResult->fetch_assoc();
+
+
+
+
+
+
+if (isset($row['p_p'])) {
+    $setIM = "SELECT * FROM student WHERE p_p = '" . $row['p_p'] . "'";
+    $searchIMResult = $conn->query($setIM);
+    $searchIMResultRow = $searchIMResult->fetch_assoc();
+} else {
+    // Handle the error condition when 'p_p' key is not defined in $row array.
+}
+
+
+if (isset($_POST['refresh'])) {
+    header('location:dashboard.php');
+}
+
+
+
+?>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="wrapper">
+    <!-- Preloader -->
+    <!-- <div class="preloader flex-column justify-content-center align-items-center">
+      <img class="animation__shake" src="img/aa.png" alt="AdminLTELogo" height="60" width="60">
+   </div> -->
+
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <!-- Left navbar links -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="index3.html" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="#" class="nav-link">Contact</a>
+            </li>
+        </ul>
+
+        <!-- Right navbar links -->
+        <ul class="navbar-nav ml-auto">
+            <!-- Navbar Search -->
+            <li class="nav-item">
+                <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+                    <i class="fas fa-search"></i>
+                </a>
+                <div class="navbar-search-block">
+                    <form class="form-inline">
+                        <div class="input-group input-group-sm">
+                            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+                            <div class="input-group-append">
+                                <button class="btn btn-navbar" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </li>
+
+            <!-- Messages Dropdown Menu -->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="far fa-comments"></i>
+                    <span class="badge badge-danger navbar-badge">3</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <a href="#" class="dropdown-item">
+                        <!-- Message Start -->
+                        <div class="media">
+                            <img src="dist/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                            <div class="media-body">
+                                <h3 class="dropdown-item-title">
+                                    Brad Diesel
+                                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                </h3>
+                                <p class="text-sm">Call me whenever you can...</p>
+                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                            </div>
+                        </div>
+                        <!-- Message End -->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <!-- Message Start -->
+                        <div class="media">
+                            <img src="dist/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                            <div class="media-body">
+                                <h3 class="dropdown-item-title">
+                                    John Pierce
+                                    <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
+                                </h3>
+                                <p class="text-sm">I got your message bro</p>
+                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                            </div>
+                        </div>
+                        <!-- Message End -->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <!-- Message Start -->
+                        <div class="media">
+                            <img src="dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                            <div class="media-body">
+                                <h3 class="dropdown-item-title">
+                                    Nora Silvester
+                                    <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
+                                </h3>
+                                <p class="text-sm">The subject goes here</p>
+                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                            </div>
+                        </div>
+                        <!-- Message End -->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+                </div>
+            </li>
+            <!-- Notifications Dropdown Menu -->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="far fa-bell"></i>
+                    <span class="badge badge-warning navbar-badge">15</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-item dropdown-header">15 Notifications</span>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-envelope mr-2"></i> 4 new messages
+                        <span class="float-right text-muted text-sm">3 mins</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-users mr-2"></i> 8 friend requests
+                        <span class="float-right text-muted text-sm">12 hours</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-file mr-2"></i> 3 new reports
+                        <span class="float-right text-muted text-sm">2 days</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                    <i class="fas fa-th-large"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+
+
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-0-primary elevation-4 " style="background-color:#00008b">
+        <!-- Brand Logo -->
+        <!-- Brand Logo -->
+        <a href="Dashboard_admin.php" class="brand-link">
+            <img src="../img/saddd.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-bold text-warning text-center" style="font-size:9px;
+font-family:Segoe Script;  font-weight: bold;"><b>Divine Healer Academy of Sorsogon</b>
+
+            </span>
+
+        </a>
+
+        <!-- Sidebar -->
+        <div class=" sidebar " style=" height: auto;">
+            <!-- Sidebar user panel (optional) -->
+            <div class="user-panel mt-2  mb-1 d-flex">
+                <div class="pull-left image">
+
+                    <img src="<?php echo $searchIMResultRow['p_p']; ?>" class="brand-image img-circle elevation-3" style="opacity: .8">
+
+                </div>
+
+
+                <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="display: none;">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <form action="queries/updateImage.php" method="POST" enctype="multipart/form-data">
+                                <div class="modal-body pd-5 p-2">
+                                    <h5 class="mb-3">Insert new image</h5>
+                                    <div class="form-group">
+                                        <input type="file" class="form-control-file form-control height-auto" name="image">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary" name="jobseekerNewImageBtn">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <a href="modal" data-toggle="modal" data-target="#modal" class="edit-avatar"><i class="fa fa-pencil"></i></a>
+
+
+
+
+
+
+
+                <div class="pull-left info">
+                    <p style="font-size:15px; font-size:20px;
+font-family:Segoe Script;" class="text-light text-bold"><b> Hello! <?= $_SESSION['auth_user']['username']; ?></b></p>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- SidebarSearch Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar  border border-1 bg-light" type="search" placeholder="Search" aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar bg-dark border border-1">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+                <li class="nav-item menu-open">
+                    <a href="dashboard.php" class="nav-link active">
+                        <i class="nav-icon fas nav-icon fas fa-copy"></i>
+                        <p>
+                            Pre-Registration Form
+                            <!-- <i ></i>   class="right fas fa-angle-left" -->
+                        </p>
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light">
+                        <i class="nav-icon fas fa-book text-light"></i>
+                        <p>
+                            Enrollment
+                            <i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="Enroll.php" class="nav-link text-light">
+                                <i class="far fa-circle nav-icon text-light"></i>
+                                <p>My Enrollment Form</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="class.php" class="nav-link text-light">
+                                <i class="far fa-circle nav-icon text-light"></i>
+                                <p>My Class</p>
+                            </a>
+                        </li>
+
+
+                    </ul>
+
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link text-light">
+                        <i class="nav-icon far fa-envelope text-light"></i>
+                        <p>
+                            Notification
+                            <i class="right fas fa-angle-left text-light"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="notification.php" class="nav-link text-light">
+                                <i class="far fa-circle nav-icon text-light"></i>
+                                <p>View Notifications</p>
+                            </a>
+                        </li>
+
+                    </ul>
+
+
+
+                </li>
+
+
+                <li class="nav-item">
+                    <a href="logoutStudent.php" class="nav-link text-light">
+                        <i class="nav-icon fas fa-sign-out-alt text-light"></i>
+                        <p>Logout</p>
+                    </a>
+
+
+
+
+                </li>
+
+
+            </ul>
+        </nav>
+
+
+        <!-- /.sidebar -->
+    </aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
+                            <li class="breadcrumb-item active">Pre-registration form</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+
+                            <!-- /.card-header -->
+
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+
+                        <div class="card">
+                            <div>
+
+                                <!-- <php include('faculty_message.php'); ?> -->
+
+
+
+                                <div>
+
+
+                                    <div class="card-body">
+                                        <!-- /.card-header -->
+                                        <div class="card-body">
+
+
+                                            <div class="container-fluid">
+                                                <div class="row">
+
+                                                    <div class="col-sm-3">
+
+                                                        <div class="container-fluid">
+                                                            <div class="row">
+
+                                                                <div class="col-sm-8">
+                                                                    <h1 style="
+font-family:Segoe Script; font-size:17px; border-radius: 15px 15px 15px 15px;
+    overflow: hidden;   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 4px 20px 0 rgba(0, 0, 0, 0.19); 
+    border-style:outset;
+  border-width: 3px;  border-color:	#ffffff;"><b>Pre-registration status</b><b>:</b></h1>
+                                                                </div>
+                                                                <div class="col-sm-4">
+                                                                    <?php if ($row['student_type'] != '') { ?>
+                                                                        <span id="success" class="badge bg-success" style="
+font-family:Segoe UI; font-size:15px; border-radius: 15px 15px 15px 15px;
+    overflow: hidden;   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 4px 20px 0 rgba(0, 0, 0, 0.19); 
+    border-style:outset;
+  border-width: 3px;  border-color:	#ffffff;"><?= $row['status']; ?></span>
+                                                                    <?php } ?>
+
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-9">
+                                                        <div class="container">
+                                                            <div class="row">
+
+                                                                <form method="POST"><button type="submit" name="refresh" class="btn btn-secondary">Refresh Page Button</button></form>
+                                                                <div class="col-sm-6 text-center">
+                                                                    <div>
+
+
+                                                                        <input value=" Academic Year:   <?= $searchYrRow['school_year']; ?> " style="font-size:20px;" class="form-control input-sm  border border-0 text-center">
+
+                                                                    </div>
+                                                                </div>
+
+
+
+
+
+
+                                                                <!-- SA SEMESTER INI WRA PA MAN LAMAN SAME SA SCHOOL YEAR-->
+                                                                <div class="col-sm-6 text-center">
+                                                                    <div>
+                                                                        <?php if ($row['GRADE_LEVEL_ID'] == '23' || $row['GRADE_LEVEL_ID'] == '24') { ?>
+                                                                            <input value=" <?= $searchSetResultRow['SEMESTER']; ?> Semester" class=" form-control input-sm  border border-0 text-center">
+                                                                        <?php } ?>
+
+                                                                    </div>
+                                                                </div>
+
+
+
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+
+
+
+
+                                                </div>
+                                            </div>
+
+
+
+
+
+
+
+
+                                            <div class="container-fluid">
+                                                <div class="row">
+
+
+
+                                                    <div class="col-sm-4">
+
+                                                        <div class="container">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">
+                                                                    <h6 style="
+font-family:Segoe Script; font-size:15px; border-radius: 15px 15px 15px 15px;
+    overflow: hidden;   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 4px 20px 0 rgba(0, 0, 0, 0.19); 
+    border-style:outset;
+  border-width: 3px;  border-color:	#ffffff;  "><b>Student_type:</b></h6>
+                                                                </div>
+
+
+                                                                <div class="col-sm-1">
+                                                                    <?php if ($row['student_type'] != '') { ?>
+                                                                        <span id="success" class="badge bg-warning " style="
+font-family:Segoe UI; font-size:15px; border-radius: 15px 15px 15px 15px;
+    overflow: hidden;   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 4px 20px 0 rgba(0, 0, 0, 0.19); 
+    border-style:outset;
+  border-width: 3px;  border-color:	#ffffff;">&nbsp <?= $row['student_type']; ?> &nbsp</span>
+                                                                    <?php } ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+
+
+                                                </div>
+                                            </div>
+
+
+
+                                            <section id="multiple-column-form">
+                                                <div class="row match-height">
+                                                    <div class="col-12">
+
+
+                                                        <div class="card-content shadow p-3 mb-5 bg-white rounded">
+                                                            <div class="container-fluid">
+                                                                <div class="row">
+
+                                                                    <!-- <div class="col-lg- col-md-12 ">
+
+                                                   </div> -->
+                                                                    <br>
+
+
+
+                                                                    <div class="col-lg-7" id="boi" style="margin:right;">
+                                                                        &nbsp &nbsp
+                                                                        <br>
+                                                                        <br>
+                                                                        <br>
+                                                                        <br>
+                                                                        <!-- border-radius: 15px 15px 15px 15px;
+    overflow: hidden;   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 4px 20px 0 rgba(0, 0, 0, 0.19); 
+    border-style:outset;
+  border-width: 3px;  border-color:	#ffffff;" -->
+                                                                        &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp<img src="../img/clip-45.png" style="width:100px;height:350px; margin-top:10px" />
+                                                                        <!-- <img src="../img/clip-46.png" style="width:200px;height:250px;" /> -->
+                                                                        <img src="../img/clip-133.png" style="width:90px;height:80px; " />
+                                                                        <img src="../img/clip-969.png" style="width:150px;height:250px;" />
+                                                                        <img src="../img/ddd.png" style="width:50px;height:50px; " />
+                                                                        <img src=" ../img/xc.png" style="width:150px;height:300px;" />
+
+
+                                                                        <!-- <img src="img/elements.png" height="75px" class="elements" /> -->
+                                                                    </div>
+
+
+
+
+
+
+                                                                    <div class="col-lg-4 col-md-12  wow fadeInUp " data-wow-delay="0.5s">
+                                                                        <h3 class="bg-light mt-3 mb-3 text-center border border-2 text-light" style=" font-family:Segoe Script; color:white;"><b>Pre-Registration Form</b></h3>
+
+                                                                        <div class=" progress">
+                                                                            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+
+                                                                        &nbsp
+                                                                        <!-- <div class="col-sm-12">
+                                                      <div class="page-heading text-center">
+
+
+
+                                                      </div>
+                                                   </div> -->
+
+
+                                                                        <form id="regiration_form" method="post" enctype="multipart/form-data">
+                                                                            <fieldset>
+
+
+                                                                                <h4 style="font-family:Verdana, Geneva, Tahoma, sans-serif">Personal Information</h4>
+                                                                                &nbsp
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Upload Image <B style="color:red">*</B></label>
+
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="file" name="image" class="form-control-file form-control height-auto" accept="image/*" required>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">First_name <B style="color:red">*</B></label>
+
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="first_name" class="form-control form-control-sm " value="<?= $row['first_name'] ?>" <?php
+
+                                                                                                                                                                                                        if ($row['first_name'] != '') {
+                                                                                                                                                                                                            echo "disabled ";
+                                                                                                                                                                                                        }
+
+                                                                                                                                                                                                        ?> required>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Last_name <B style="color:red">*</B> </label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="last_name" class="form-control form-control-sm" value="<?= $row['last_name'] ?>" <?php
+
+                                                                                                                                                                                                    if ($row['last_name'] != '') {
+                                                                                                                                                                                                        echo "disabled ";
+                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                    ?> required>
+
+
+                                                                                    </div>
+                                                                                </div>
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Middle_name <B style="color:red">*</B> </label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="middle_name" class="form-control form-control-sm " value="<?= $row['middle_name'] ?>" <?php
+
+                                                                                                                                                                                                        if ($row['middle_name'] != '') {
+                                                                                                                                                                                                            echo "disabled ";
+                                                                                                                                                                                                        }
+
+                                                                                                                                                                                                        ?> required>
+
+                                                                                    </div>
+                                                                                </div>
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Suffix_name</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="suffix_name" class="form-control form-control-sm" value="<?= $row['suffix_name'] ?>" maxlength="2" <?php
+
+                                                                                                                                                                                                                    if ($row['suffix_name'] != '') {
+                                                                                                                                                                                                                        echo "disabled ";
+                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                    ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Birth_date<B style="color:red">*</B></label>
+
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="date" name="birthdate" class="form-control form-control-sm " value="<?= $row['birthdate'] ?>" <?php
+
+                                                                                                                                                                                                    if ($row['birthdate'] != '') {
+                                                                                                                                                                                                        echo "disabled";
+                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                    ?> required>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Birth_place<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="birthplace" class="form-control form-control-sm " value="<?= $row['birthplace'] ?>" <?php
+
+                                                                                                                                                                                                        if ($row['birthplace'] != '') {
+                                                                                                                                                                                                            echo "disabled";
+                                                                                                                                                                                                        }
+                                                                                                                                                                                                        ?>required>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+
+                                                                                <input type="button" name="birthplace" class="next btn btn-info" value="Next" />
+                                                                            </fieldset>
+
+                                                                            <fieldset>
+                                                                                <h4 style="font-family:Verdana, Geneva, Tahoma, sans-serif">Personal Information</h4>
+                                                                                &nbsp
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Age<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="number" name="age" class="form-control form-control-sm" value="<?= $row['age'] ?>" maxlength="2" <?php
+
+                                                                                                                                                                                                        if ($row['age'] != '') {
+                                                                                                                                                                                                            echo "disabled ";
+                                                                                                                                                                                                        }
+
+                                                                                                                                                                                                        ?>required>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                                <!-- <div class="form-group row">
+                                                               <label class="col-sm-4 col-form-label">Email<B style="color:red">*</B></label>
+                                                               <div class="col-sm-8">
+                                                                  <input type="text" name="email" class="form-control form-control-sm" value="<?= $row['email'] ?>" <?php
+
+                                                                                                                                                                    if ($row['email'] != '') {
+                                                                                                                                                                        echo "disabled ";
+                                                                                                                                                                    }
+
+                                                                                                                                                                    ?>required>
+                                                               </div>
+                                                            </div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Contact_no<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="contact_number" class="form-control form-control-sm " value="<?= $row['contact_number'] ?>" maxlength="12" <?php
+
+                                                                                                                                                                                                                            if ($row['contact_number'] != '') {
+                                                                                                                                                                                                                                echo "disabled ";
+                                                                                                                                                                                                                            }
+
+                                                                                                                                                                                                                            ?>required>
+
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Height(cm)</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="height" class="form-control " value="<?= $row['height'] ?>" maxlength="3" <?php
+
+                                                                                                                                                                                            if ($row['height'] != '') {
+                                                                                                                                                                                                echo "disabled";
+                                                                                                                                                                                            }
+                                                                                                                                                                                            ?>>
+
+
+
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Weight(cm)</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="weight" class="form-control " value="<?= $row['weight'] ?>" maxlength="3" <?php
+
+                                                                                                                                                                                            if ($row['weight'] != '') {
+                                                                                                                                                                                                echo "disabled";
+                                                                                                                                                                                            }
+                                                                                                                                                                                            ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Religion<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="religion" class="form-control" value="<?= $row['religion'] ?>" <?php
+
+                                                                                                                                                                                if ($row['religion'] != '') {
+                                                                                                                                                                                    echo "disabled";
+                                                                                                                                                                                }
+                                                                                                                                                                                ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Civil_status<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="civil_status" class="form-control" value="<?= $row['civil_status'] ?>" <?php
+
+                                                                                                                                                                                        if ($row['civil_status'] != '') {
+                                                                                                                                                                                            echo "disabled";
+                                                                                                                                                                                        }
+                                                                                                                                                                                        ?>required>
+
+                                                                                    </div>
+
+                                                                                </div>
+
+
+
+
+
+
+
+                                                                                <input type="button" name="previous" class="previous btn btn-default" value="Previous" />
+                                                                                <input type="button" name="next" class="next btn btn-info" value="Next" />
+
+                                                                            </fieldset>
+
+
+
+                                                                            <fieldset>
+                                                                                <h4 style="font-family:Verdana, Geneva, Tahoma, sans-serif">Address Information</h4>
+                                                                                &nbsp
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">House_Number</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="unit_number" class="form-control " value="<?= $row['unit_number'] ?>" <?php
+
+                                                                                                                                                                                        if ($row['unit_number'] != '') {
+                                                                                                                                                                                            echo "disabled ";
+                                                                                                                                                                                        }
+
+                                                                                                                                                                                        ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Street<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="street" class="form-control " value="<?= $row['street'] ?>" <?php
+
+                                                                                                                                                                                if ($row['street'] != '') {
+                                                                                                                                                                                    echo "disabled ";
+                                                                                                                                                                                }
+
+                                                                                                                                                                                ?>>
+
+
+                                                                                    </div>
+
+                                                                                </div>
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Barangay<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="barangay" class="form-control" value="<?= $row['barangay'] ?>" <?php
+
+                                                                                                                                                                                if ($row['barangay'] != '') {
+                                                                                                                                                                                    echo "disabled ";
+                                                                                                                                                                                }
+
+                                                                                                                                                                                ?>required>
+                                                                                    </div>
+                                                                                </div>
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Zip_code<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="zip_code" class="form-control  " value="<?= $row['zip_code'] ?>" <?php
+
+                                                                                                                                                                                    if ($row['zip_code'] != '') {
+                                                                                                                                                                                        echo "disabled ";
+                                                                                                                                                                                    }
+
+                                                                                                                                                                                    ?>required>
+                                                                                    </div>
+                                                                                </div>
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">District<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="district" class="form-control" value="<?= $row['district'] ?>" <?php
+
+                                                                                                                                                                                if ($row['district'] != '') {
+                                                                                                                                                                                    echo "disabled";
+                                                                                                                                                                                }
+
+                                                                                                                                                                                ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">City<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="city" class="form-control" value="<?= $row['city'] ?>" <?php
+
+                                                                                                                                                                        if ($row['city'] != '') {
+                                                                                                                                                                            echo "disabled";
+                                                                                                                                                                        }
+
+                                                                                                                                                                        ?>required>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+
+
+                                                                                <input type="button" name="previous" class="previous btn btn-default" value="Previous" />
+                                                                                <input type="button" name="next" class="next btn btn-info" value="Next" />
+                                                                            </fieldset>
+
+
+                                                                            <fieldset>
+
+                                                                                <h4 style="font-family:Verdana, Geneva, Tahoma, sans-serif">Parent / Guardian Information </h4>
+                                                                                &nbsp
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Parent_name:</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="parent_name" class="form-control" value="<?= $row['parent_name'] ?>" <?php
+
+                                                                                                                                                                                        if ($row['parent_name'] != '') {
+                                                                                                                                                                                            echo "disabled";
+                                                                                                                                                                                        }
+                                                                                                                                                                                        ?>>
+
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Occupation:</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="parent_occupation" class="form-control " value="<?= $row['parent_occupation'] ?>" <?php
+
+                                                                                                                                                                                                    if ($row['parent_occupation'] != '') {
+                                                                                                                                                                                                        echo "disabled";
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                    ?>>
+
+
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Contact_no</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="parent_contact_no" class="form-control " value="<?= $row['parent_contact_no'] ?>" maxlength="12" <?php
+
+                                                                                                                                                                                                                    if ($row['parent_contact_no'] != '') {
+                                                                                                                                                                                                                        echo "disabled";
+                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                    ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Guardian_name</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="guardian_name" class="form-control" value="<?= $row['guardian_name'] ?>" <?php
+
+                                                                                                                                                                                            if ($row['guardian_name'] != '') {
+                                                                                                                                                                                                echo "disabled";
+                                                                                                                                                                                            }
+                                                                                                                                                                                            ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Occupation</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="guardian_occupation" class="form-control " value="<?= $row['guardian_occupation'] ?>" <?php
+
+                                                                                                                                                                                                        if ($row['guardian_occupation'] != '') {
+                                                                                                                                                                                                            echo "disabled";
+                                                                                                                                                                                                        }
+                                                                                                                                                                                                        ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Contact_no</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="guardian_contact_no" class="form-control" value="<?= $row['guardian_contact_no'] ?>" maxlength="12" <?php
+
+                                                                                                                                                                                                                        if ($row['guardian_contact_no'] != '') {
+                                                                                                                                                                                                                            echo "disabled";
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                        ?>>
+
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+                                                                                <input type="button" name="previous" class="previous btn btn-default" value="Previous" />
+                                                                                <input type="button" name="next" class="next btn btn-info" value="Next" />
+                                                                            </fieldset>
+
+
+
+
+
+                                                                            <fieldset>
+                                                                                <h4 style="font-family:Verdana, Geneva, Tahoma, sans-serif">Other Information</h4>
+                                                                                &nbsp
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Date_of_Reg <B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="date" name="date_of_registration" class="form-control input-sm  " value="<?= $row['date_of_registration'] ?>" <?php
+
+                                                                                                                                                                                                                    if ($row['date_of_registration'] != '') {
+                                                                                                                                                                                                                        echo "disabled ";
+                                                                                                                                                                                                                    }                                                                                                         ?> required>
+                                                                                    </div>
+                                                                                </div>
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Student_type<B style="color:red">*</B></label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <?php if ($row['student_type'] != '') : ?>
+                                                                                            <select id="student_type" onchange="loadData()" name="student_type" class="form-control" disabled required>
+                                                                                                <option value="new"><?= $row['student_type']; ?></option>
+                                                                                            </select>
+                                                                                        <?php else : ?>
+                                                                                            <select id="student_type" onchange="loadData()" name="student_type" class="form-control" required>
+                                                                                                <option value="">--Select type--</option>
+                                                                                                <option value="new">New</option>
+                                                                                                <option value="old">Old</option>
+                                                                                                <option value="transferee">Transferee</option>
+                                                                                                <option value="returnee">Returnee</option>
+                                                                                            </select>
+                                                                                        <?php endif; ?>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <?php
+
+
+
+                                                                                    $query = "SELECT * from grade_level ";
+                                                                                    $result = mysqli_query($conn, $query);
+
+                                                                                    ?>
+
+                                                                                    <label class="col-sm-4 col-form-label">Grade Level</label>
+                                                                                    <!-- <p><?= $data['GRADE_LEVEL']; ?></p> -->
+                                                                                    <div class="col-sm-8">
+                                                                                        <?php if ($row['GRADE_LEVEL_ID'] != '') : ?>
+                                                                                            <?php
+                                                                                            $query = "SELECT * from grade_level where GRADE_LEVEL_ID = '$row[GRADE_LEVEL_ID]'";
+                                                                                            $result = mysqli_query($conn, $query);
+                                                                                            $bulbol = mysqli_fetch_assoc($result);
+                                                                                            ?>
+                                                                                            <select id="GRADE_LEVEL_ID" name="GRADE_LEVEL" class="form-control bg-light">
+                                                                                                <option value="new"><?= $bulbol['GRADE_LEVEL']; ?></option>
+                                                                                            </select>
+
+
+
+
+                                                                                        <?php else : ?>
+                                                                                            <select id="GRADE_LEVEL" name="GRADE_LEVEL" class="form-control bg-light" required>
+
+                                                                                                <?php foreach ($result as $data) : ?>
+                                                                                                    <option value="<?= $data['GRADE_LEVEL_ID']; ?>"><?= $data['GRADE_LEVEL']; ?></option>
+                                                                                                <?php endforeach; ?>
+                                                                                            </select>
+                                                                                        <?php endif; ?>
+
+                                                                                    </div>
+                                                                                </div>
+
+
+                                                                                <!-- if ($row['guardian_contact_no'] != '') {
+                                                                                                                                                                                 echo "disabled";
+                                                                                                                                                                              } -->
+                                                                                <!-- <php if ($row['GRADE_LEVEL_ID'] == '23' || $row['GRADE_LEVEL_ID'] == '24') { ?> -->
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">Strand for SHS:</label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <?php if ($row['strand'] != '') : ?>
+                                                                                            <select id="strand" name="strand" class="form-control " class="form-control bg-light" disabled required>
+                                                                                                <option value="new"><?= $row['strand']; ?></option>
+                                                                                            </select>
+                                                                                        <?php else : ?>
+                                                                                            <select id='strand' name="strand" class="form-control" class="form-control bg-light" required>
+                                                                                                <option value="None">--Select strand--</option>
+                                                                                                <option value="GAS">General Academic Strand</option>
+                                                                                                <option value="HUMMS">Humanities and social sciences </option>
+                                                                                                <option value="STEM">Science, technology, engineering, and mathematics</option>
+                                                                                                <option value="ABM">Accountancy, business, and management</option>
+
+                                                                                            </select>
+                                                                                        <?php endif; ?>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <!-- 
+                                                            <php } ?> -->
+
+
+
+
+                                                                                <div id="loaddata"></div>
+
+
+
+                                                                                <div class="form-group row">
+                                                                                    <label class="col-sm-4 col-form-label">LRN: </label>
+                                                                                    <div class="col-sm-8">
+                                                                                        <input type="text" name="LRN" class="form-control input-sm  " value="<?= $row['LRN'] ?>" <?php
+
+                                                                                                                                                                                    if ($row['LRN'] != '') {
+                                                                                                                                                                                        echo "disabled ";
+                                                                                                                                                                                    }
+
+                                                                                                                                                                                    ?>>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+
+
+
+
+
+                                                                                <input type="button" name="previous" class="previous btn btn-default" value="Previous" />
+                                                                                <?php if ($row1['student_id'] == '0') : ?>
+                                                                                    <input type="submit" name="<?= $action ?>" value="<?= $btn_value ?>" class="btn btn-success btn-sm ">
+                                                                                <?php else : ?>
+                                                                                    <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#exampleModal">
+                                                                                        Edit
+                                                                                    </button>
+                                                                                <?php endif; ?>
+
+                                                                            </fieldset>
+                                                                        </form>
+                                                                    </div>
+
+
+                                                                    <!-- <div class="col-lg-2 col-md-12 wow fadeInUp " data-wow-delay="0.5s">
+                                    </div> -->
+                                                                </div>
+                                                            </div>
+
+
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </section>
+
+
+
+                                            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" style="margin-right: 850px !important;">
+                                                    <div class="modal-content" style="width: 1250px !important;">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel"> EDIT PRE-REGISTRATION FORM</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <!-- INI NA action = "actions/editAction.php" nasa folder in sa pinakataas parang function para gumana modal ng ma edit ito na nasa mismong database -->
+                                                            <form action="actions/editAction.php" method="POST">
+                                                                <div class="container mt-5">
+                                                                    <div class="col-sm-12 ">
+                                                                        <div class="row">
+
+
+                                                                            <!-- class="container-fluid border border-10 text-light " style="   background:;  padding: 15px;
+     border-radius: 15px 50px;  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      text-align: center;  " -->
+                                                                            <div class="container-fluid  mb-4">
+                                                                                <div class="row">
+
+
+                                                                                    <div class="col-md-6 col-12">
+                                                                                        <div class="form-group text-center">
+
+                                                                                        </div>
+                                                                                    </div>
+
+
+
+
+                                                                                    <div class="col-md-6 col-12">
+                                                                                        <div class="form-group text-center">
+                                                                                            <!-- <label class="mb-3">Insert new image</label>
+                                                                     <div class="form-group">
+                                                                        <input type="file" class="form-control-file form-control height-auto" name="image">
+                                                                     </div> -->
+                                                                                        </div>
+                                                                                    </div>
+
+
+                                                                                    <div class="col-sm-6 ">
+
+                                                                                        <div class="form-group text-center">
+                                                                                            <?php if ($row['GRADE_LEVEL_ID'] == '23' || $row['GRADE_LEVEL_ID'] == '24') { ?>
+                                                                                                <label>Semester</label>
+                                                                                                <input value=" <?= $searchSetResultRow['SEMESTER']; ?> Semester" class=" form-control input-sm   text-center">
+                                                                                            <?php } else {
+                                                                                                echo '<div class="alert alert-success text-center mt-4" role="alert" style = "font-size:10px">
+                                                                          COMPLETE THE PRE-REGISTRATION FORM
+                                                                          </div>';
+                                                                                            } ?>
+
+                                                                                        </div>
+
+
+                                                                                    </div>
+
+
+
+
+
+                                                                                    <div class="col-md-6 col-12">
+                                                                                        <div class="form-group text-center">
+                                                                                            <label>Academic Year</label>
+                                                                                            <input value="   <?= $searchYrRow['school_year']; ?> " class=" form-control input-sm  border border-1 text-center">
+                                                                                        </div>
+                                                                                    </div>
+
+
+                                                                                    <div class="col-sm-2 ">
+                                                                                        <label>Date_of_registration <B style="color:red">*</B> </label>
+                                                                                        <input type="date" name="date_of_registration" class="form-control  input-sm  " value="<?= $row['date_of_registration'] ?>" <?php
+
+                                                                                                                                                                                                                    ?> required>
+                                                                                    </div>
+
+                                                                                    <div class="col-sm-2">
+
+                                                                                        <label>Student_type <B style="color:red">*</B></label>
+
+
+
+
+                                                                                        <select id="student_type" name="student_type" class="form-control" class="form-control bg-light" required>
+                                                                                            <option value="new">New</option>
+                                                                                            <option value="old">Old</option>
+                                                                                            <option value="transferee">Transferee</option>
+                                                                                            <option value="returnee">Returnee</option>
+                                                                                        </select>
+                                                                                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                    <div class="col-sm-4 ">
+                                                                                        <label>School_last_attended</label>
+                                                                                        <input type="text" name="school_last_attended" class="form-control  input-sm  " value="<?= $row['school_last_attended'] ?>" <?php
+
+
+
+                                                                                                                                                                                                                    ?>>
+                                                                                    </div>
+
+
+                                                                                    <div class="col-sm-3 ">
+                                                                                        <label>School_year</label>
+                                                                                        <input type="text" name="school_year" class="form-control  input-sm " placeholder="ex. 2019-2020" value="<?= $row['school_year'] ?>" <?php
+
+
+
+                                                                                                                                                                                                                                ?>>
+                                                                                    </div>
+
+
+
+
+
+
+
+
+
+
+                                                                                    <div class="col-md-3 col-12">
+
+                                                                                        <?php
+
+
+                                                                                        $query = "SELECT * from grade_level";
+                                                                                        $result = mysqli_query($conn, $query);
+
+                                                                                        ?>
+
+                                                                                        <label class="mt-3">Grade Level</label>
+                                                                                        <!-- <p><?= $data['GRADE_LEVEL']; ?></p> -->
+                                                                                        <div class="form-group">
+
+                                                                                            <select id="strand" name="GRADE_LEVEL" class="form-control " class="form-control bg-light ">
+
+
+                                                                                                <?php foreach ($result as $data) : ?>
+                                                                                                    <option value="<?= $data['GRADE_LEVEL_ID']; ?>"><?= $data['GRADE_LEVEL']; ?></option>
+                                                                                                <?php endforeach; ?>
+                                                                                            </select>
+                                                                                        </div>
+
+                                                                                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                    <div class="col-sm-3">
+                                                                                        <label class="mt-3">LRN: <B style="color:red">*</B></label>
+                                                                                        <input type="text" name="LRN" class="form-control " value="<?= $row['LRN'] ?>" <?php
+
+
+                                                                                                                                                                        ?>>
+                                                                                    </div>
+
+
+
+
+                                                                                    <div class="col-sm-3">
+
+                                                                                        <label class="mt-3">Strand: (SHS only) <B style="color:red">*</B></label>
+
+                                                                                        <select id="strand" name="strand" class="form-control " class="form-control bg-light" required>
+                                                                                            <option value="N/A">--Select strand--</option>
+                                                                                            <option value="GAS">General Academic Strand</option>
+                                                                                            <option value="HUMMS">Humanities and social sciences </option>
+                                                                                            <option value="STEM">Science, technology, engineering, and mathematics</option>
+                                                                                            <option value="ABM">Accountancy, business, and management</option>
+                                                                                        </select>
+                                                                                    </div>
+
+
+
+
+
+                                                                                    <div class="col-sm-3 ">
+
+
+                                                                                        <label class="mt-3"> <B style="color:red">*</B></label>
+                                                                                        <input type="text" name="first_name" class="form-control input-sm  ">
+                                                                                    </div>
+
+
+
+                                                                                </div>
+                                                                            </div>
+
+
+
+                                                                            <!-- aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa -->
+
+
+                                                                            <div class="container-fluid mb-4">
+                                                                                <h4 class="bg-light mt-3 mb-3 text-center border border-2 text-light" style=" font-family:Segoe UI; color:white;"><b>Personal Information</b></h4>
+                                                                                <div class="row">
+
+
+                                                                                    <div class="col-sm-3 ">
+
+
+                                                                                        <label>First_name <B style="color:red">*</B></label>
+                                                                                        <input type="text" name="first_name" class="form-control input-sm  " value="<?= $row['first_name'] ?>" <?php
+
+                                                                                                                                                                                                ?> required>
+                                                                                    </div>
+
+
+
+
+                                                                                    <div class="col-sm-3 ">
+                                                                                        <label>Last_name <B style="color:red">*</B> </label>
+                                                                                        <input type="text" name="last_name" class="form-control  input-sm  " value="<?= $row['last_name'] ?>" <?php
+
+
+
+                                                                                                                                                                                                ?> required>
+                                                                                    </div>
+
+                                                                                    <div class="col-sm-3">
+                                                                                        <label>Middle_name <B style="color:red">*</B> </label>
+                                                                                        <input type="text" name="middle_name" class="form-control" value="<?= $row['middle_name'] ?>" <?php
+
+
+
+                                                                                                                                                                                        ?> required>
+                                                                                    </div>
+
+                                                                                    <div class="col-sm-2 ">
+                                                                                        <label>Suffix_name</label>
+                                                                                        <input type="text" name="suffix_name" class="form-control " value="<?= $row['suffix_name'] ?>" <?php
+
+
+                                                                                                                                                                                        ?>>
+                                                                                    </div>
+
+                                                                                    <div class="col-sm-1 ">
+                                                                                        <label>Age <B style="color:red">*</B></label>
+                                                                                        <input type="number" name="age" class="form-control  " value="<?= $row['age'] ?>" <?php
+
+
+
+                                                                                                                                                                            ?> required>
+                                                                                    </div>
+
+                                                                                    <div class="col-sm-4 ">
+                                                                                    </div>
+                                                                                    <!-- 
+                                                               <div class="col-sm-4 ">
+                                                                  <label class="mt-3">Email <B style="color:red">*</B></label>
+                                                                  <input type="text" name="email" class="form-control  " value="<?= $row['email'] ?>" <?php
+
+
+
+                                                                                                                                                        ?> required>
+                                                               </div> -->
+
+
+
+
+                                                                                    <div class="col-sm-3 ">
+                                                                                        <label class="mt-3">Contact_number <B style="color:red">*</B></label>
+                                                                                        <input type="text" name="contact_number" class="form-control " value="<?= $row['contact_number'] ?>" <?php
+
+
+                                                                                                                                                                                                ?>required>
+                                                                                    </div>
+
+
+                                                                                    <!-- <div class="col-sm-3 ">
+                                                <label class="mt-3">Email </label>
+                                                <input type="text" name="email" class="form-control border border-dark " value="<?= $row['email'] ?>" <?php
+
+
+                                                                                                                                                        ?>>
+                                             </div> -->
+
+
+
+
+
+                                                                                    <div class="col-sm-2 ">
+                                                                                        <label class="mt-3">Birth_date <B style="color:red">*</B></label>
+                                                                                        <input type="date" name="birthdate" class="form-control " value="<?= $row['birthdate'] ?>" <?php
+
+
+                                                                                                                                                                                    ?>>
+                                                                                    </div>
+
+
+
+                                                                                    <div class="col-sm-3  ">
+                                                                                        <label class="mt-3">Birth_place <B style="color:red">*</B></label>
+                                                                                        <input type="text" name="birthplace" class="form-control " value="<?= $row['birthplace'] ?>" <?php
+
+                                                                                                                                                                                        ?>>
+                                                                                    </div>
+
+
+
+                                                                                    <div class="col-sm-3">
+                                                                                        <label class="mt-3">Civil_status</label>
+                                                                                        <input type="text" name="civil_status" class="form-control " value="<?= $row['civil_status'] ?>" <?php
+
+
+                                                                                                                                                                                            ?>>
+                                                                                    </div>
+
+
+
+
+
+                                                                                    <div class="col-sm-2 mb-3 ">
+                                                                                        <label class="mt-3">Height(cm)</label>
+                                                                                        <input type="text" name="height" class="form-control " value="<?= $row['height'] ?>" <?php
+
+
+                                                                                                                                                                                ?>>
+                                                                                    </div>
+
+
+
+
+                                                                                    <div class="col-sm-2 mb-3 ">
+                                                                                        <label class="mt-3">Weight(Kg)</label>
+                                                                                        <input type="text" name="weight" class="form-control " value="<?= $row['weight'] ?>" <?php
+
+                                                                                                                                                                                ?>>
+                                                                                    </div>
+
+
+                                                                                    <div class="col-sm-2 mb-3 ">
+                                                                                        <label class="mt-3">Gender</label>
+                                                                                        <input type="text" name="gender" class="form-control " value="<?= $row['gender'] ?>" <?php
+
+
+
+                                                                                                                                                                                ?>>
+                                                                                    </div>
+
+
+                                                                                    <div class="col-sm-3 mb-3">
+                                                                                        <label class="mt-3">Religion</label>
+                                                                                        <input type="text" name="religion" class="form-control " value="<?= $row['religion'] ?>" <?php
+
+
+                                                                                                                                                                                    ?>>
+                                                                                    </div>
+
+
+                                                                                </div>
+                                                                            </div>
+                                                                            <!-- dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd -->
+
+
+
+
+
+                                                                            <div class="container-fluid  mb-4 ">
+                                                                                <h4 class="container-fluid mb-4">
+                                                                                    <h4 class="bg-light mt-3 mb-3 text-center border border-2 text-light" style=" font-family:Segoe UI; color:white;"><b>Address Information</b></h4>
+                                                                                    <div class="row">
+                                                                                        <div class="col-sm-2 mb-3">
+                                                                                            <label class="mt-3">House_Number</label>
+                                                                                            <input type="text" name="unit_number" class="form-control" value="<?= $row['unit_number'] ?>" <?php
+
+
+                                                                                                                                                                                            ?>>
+                                                                                        </div>
+
+
+                                                                                        <div class="col-sm-2 mb-3 ">
+                                                                                            <label class="mt-3">Street</label>
+                                                                                            <input type="text" name="street" class="form-control " value="<?= $row['street'] ?>" <?php
+
+
+                                                                                                                                                                                    ?>>
+                                                                                        </div>
+
+                                                                                        <div class="col-sm-2 mb-3 ">
+                                                                                            <label class="mt-3">Barangay</label>
+                                                                                            <input type="text" name="barangay" class="form-control" value="<?= $row['barangay'] ?>" <?php
+
+
+                                                                                                                                                                                    ?>>
+                                                                                        </div>
+
+
+
+                                                                                        <div class="col-sm-2 mb-3 ">
+                                                                                            <label class="mt-3">District</label>
+                                                                                            <input type="text" name="district" class="form-control" value="<?= $row['district'] ?>" <?php
+
+                                                                                                                                                                                    ?>>
+                                                                                        </div>
+
+
+
+
+
+
+                                                                                        <div class="col-sm-1 mb-3">
+                                                                                            <label class="mt-3">Zip_code</label>
+                                                                                            <input type="text" name="zip_code" class="form-control  " value="<?= $row['zip_code'] ?>" <?php
+
+
+
+                                                                                                                                                                                        ?>>
+                                                                                        </div>
+
+
+
+                                                                                        <div class="col-sm-3 mb-3">
+                                                                                            <label class="mt-3">City</label>
+                                                                                            <input type="text" name="city" class="form-control " value="<?= $row['city'] ?>" <?php
+
+
+
+                                                                                                                                                                                ?>>
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                            </div>
+
+
+
+
+
+                                                                            <div class="container-fluid">
+                                                                                <h4 class="container-fluid mb-4">
+                                                                                    <h4 class="bg-light mt-3 mb-3 text-center border border-2 text-light" style=" font-family:Segoe UI; color:white;"><b>Parent/Guardian Information</b></h4>
+                                                                                    <div class="row">
+
+                                                                                        <div class="col-sm-4">
+                                                                                            <label class="mt-3">Parent_name</label>
+                                                                                            <input type="text" name="parent_name" class="form-control " value="<?= $row['parent_name'] ?>" <?php
+
+                                                                                                                                                                                            ?>>
+                                                                                        </div>
+
+                                                                                        <div class="col-sm-4 ">
+                                                                                            <label class="mt-3">Parent_occupation</label>
+                                                                                            <input type="text" name="parent_occupation" class="form-control " value="<?= $row['parent_occupation'] ?>" <?php
+
+                                                                                                                                                                                                        ?>>
+                                                                                        </div>
+
+                                                                                        <div class="col-sm-4 ">
+                                                                                            <label class="mt-3">Parent_contact_no</label>
+                                                                                            <input type="text" name="parent_contact_no" class="form-control " value="<?= $row['parent_contact_no'] ?>" <?php
+
+
+                                                                                                                                                                                                        ?>>
+                                                                                        </div>
+
+                                                                                        <div class="col-sm-4 ">
+                                                                                            <label class="mt-3">Guardian_name</label>
+                                                                                            <input type="text" name="guardian_name" class="form-control " value="<?= $row['guardian_name'] ?>" <?php
+
+                                                                                                                                                                                                ?>>
+                                                                                        </div>
+
+
+
+                                                                                        <div class="col-sm-4">
+                                                                                            <label class="mt-3">Guardian_occupation</label>
+                                                                                            <input type="text" name="guardian_occupation" class="form-control " value="<?= $row['guardian_occupation'] ?>" <?php
+
+
+                                                                                                                                                                                                            ?>>
+                                                                                        </div>
+
+                                                                                        <div class="col-sm-4">
+                                                                                            <label class="mt-3">Guardian_contact_no</label>
+                                                                                            <input type="text" name="guardian_contact_no" class="form-control " value="<?= $row['guardian_contact_no'] ?>" <?php
+
+                                                                                                                                                                                                            ?>>
+                                                                                        </div>
+
+
+
+                                                                                        <div class="col-sm-3 mt-2 d-flex justify-content-start align-items-center" class="form-control ">
+
+                                                                                        </div>
+
+                                                                                        <div class="col-sm-3 mt-2 d-flex justify-content-start align-items-center" class="form-control ">
+
+                                                                                        </div>
+
+
+                                                                                        <div class="col-sm-3 mt-2 d-flex justify-content-start align-items-center" class="form-control ">
+
+                                                                                        </div>
+                                                                                        <div class="col-sm-1 mt-2 d-flex justify-content-start align-items-center" class="form-control ">
+
+                                                                                        </div>
+
+
+                                                                                        <!-- 
+                                                               <div class="form-group row">
+                                                                  <label class="col-sm-4 col-form-label">Upload Image <B style="color:red">*</B></label>
+
+                                                                  <div class="col-sm-8">
+                                                                     <input type="file" name="name" class="form-control-file form-control height-auto" accept="image/*" required>
+                                                                  </div>
+                                                               </div> -->
+
+                                                                                        <div class="col-sm-2 mt-2 d-flex justify-content-start align-items-center" class="form-control ">
+                                                                                            <input type="submit" name="<?= $action ?>" value="<?= $btn_value ?>" class="btn btn-success btn-sm mb-3" style="margin-top:33px">
+                                                                                        </div>
+
+
+
+
+                                                                                    </div>
+                                                                            </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <!-- /.card-body -->
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                    </div>
+                    <!-- /.container-fluid -->
+        </section>
+
+        <!-- /.content -->
+    </div>
+
+    <!-- /.content-wrapper -->
+    <footer class="main-footer">
+        <div class="float-right d-none d-sm-block">
+
+        </div>
+        <strong>&copy;<a href="https://adminlte.io"> Divine Healer Academy of Sorsogon</a>.</strong> All rights reserved.
+    </footer>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+
+
+
+<style type="text/css">
+    .elements {
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
+
+    #boi {}
+
+    #regiration_form fieldset:not(:first-of-type) {
+        display: none;
+    }
+</style>
+
+
+<script>
+    $(document).ready(function() {
+        var current = 1,
+            current_step, next_step, steps;
+        steps = $("fieldset").length;
+        $(".next").click(function() {
+            current_step = $(this).parent();
+            next_step = $(this).parent().next();
+            next_step.show();
+            current_step.hide();
+            setProgressBar(++current);
+        });
+        $(".previous").click(function() {
+            current_step = $(this).parent();
+            next_step = $(this).parent().prev();
+            next_step.show();
+            current_step.hide();
+            setProgressBar(--current);
+        });
+        setProgressBar(current);
+        // Change progress bar action
+        function setProgressBar(curStep) {
+            var percent = parseFloat(100 / steps) * curStep;
+            percent = percent.toFixed();
+            $(".progress-bar")
+                .css("width", percent + "%")
+                .html(percent + "%");
+        }
+    });
+</script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<?php if (isset($_GET['studa'])) : ?>
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: ' top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+        Toast.fire({
+            icon: 'success',
+            title: 'Successfully Login to Student Dashboard!'
+        })
+    </script>
+
+<?php endif; ?>
+
+
+
+
+
+
+
+<?php if (isset($_GET['edited'])) : ?>
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+        Toast.fire({
+            icon: 'success',
+            title: 'Successfully Updated!'
+        })
+    </script>
+
+<?php endif; ?>
+
+
+
+
+
+
+
+<?php if (isset($_GET['added'])) : ?>
+    <script>
+        Swal.fire(
+            'Wait for Admin Approval',
+            'Information has been Sent to Admin',
+            'success'
+        )
+    </script>
+<?php endif; ?>
+
+
+
+
+
+<?php if (isset($_GET['Cont'])) : ?>
+    <script>
+        Swal.fire({
+            title: 'Error!',
+            text: 'Contact Number has been used by other',
+            icon: 'error',
+            confirmButtonText: 'Logout your Account then Change Contact number '
+        })
+    </script>
+<?php endif; ?>
+
+
+
+
+
+
+<script>
+    function loadData() {
+        var student_type = document.getElementById("student_type").value;
+
+        if (student_type == "transferee") {
+            // Send AJAX request to the PHP file that will return the data
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // Append the response to the HTML element with id "loaddata"
+                    document.getElementById("loaddata").innerHTML = this.responseText;
+                }
+            };
+            xmlhttp.open("GET", "loaddata.php", true);
+            xmlhttp.send();
+        } else {
+            // Clear the HTML element with id "loaddata"
+            document.getElementById("loaddata").innerHTML = "";
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+<?php include('includes/footer.php'); ?>

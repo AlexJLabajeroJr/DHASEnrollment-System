@@ -1,0 +1,5 @@
+;/*FB_PKG_DELIM*/
+
+__d("adjustFaceboxPosition",[],(function(a,b,c,d,e,f){"use strict";function a(a){var b=a.boxSize,c=a.imageDimension;a=a.originalPos;return a<0?0:a+b>c?c-b:a}f["default"]=a}),66);
+__d("BirthdayCometContentQuery_facebookRelayOperation",[],(function(a,b,c,d,e,f){e.exports="5936058919824158"}),null);
+__d("EventCometBirthdayMegaphoneRootQuery_facebookRelayOperation",[],(function(a,b,c,d,e,f){e.exports="6071968942916161"}),null);
